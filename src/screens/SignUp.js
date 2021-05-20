@@ -1,10 +1,6 @@
-import { darkModeVar, isLoggedInVar } from "../apollo";
 import styled from "styled-components";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faFacebookSquare,
-  faInstagram,
-} from "@fortawesome/free-brands-svg-icons";
+import { faInstagram } from "@fortawesome/free-brands-svg-icons";
 import { Link } from "react-router-dom";
 import AuthLayout from "../components/auth/AuthLayout";
 import BottomBox from "../components/auth/BottomBox";
@@ -13,44 +9,41 @@ import FormBox from "../components/auth/FormBox";
 import Button from "../components/auth/Button";
 import Input from "../components/auth/Input";
 import Separator from "../components/auth/Separator";
+import { FatLink } from "../components/shared";
 
-const FacebookLogin = styled.div`
-  color: #385285;
-  span {
-    margin-left: 10px;
-    font-weight: 600;
-  }
+const HeaderContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 `;
 
-const Title = styled.h1`
-  color: ${(props) => props.theme.fontColor};
+const Subtitle = styled(FatLink)`
+  font-size: 16px;
+  text-align: center;
+  margin-top: 10px;
 `;
 
-const Login = () => {
+const SignUp = () => {
   return (
     <AuthLayout>
       <FormBox>
-        <div>
+        <HeaderContainer>
           <FontAwesomeIcon icon={faInstagram} size="3x" />
-        </div>
+          <Subtitle>
+            Sign up to see photos and videos from your friends.
+          </Subtitle>
+        </HeaderContainer>
         <form>
+          <Input type="text" placeholder="Name" />
+          <Input type="text" placeholder="Email" />
           <Input type="text" placeholder="Username" />
           <Input type="password" placeholder="Password" />
-          <Button type="submit" value="Log in" />
+          <Button type="submit" value="Sign up" />
         </form>
-        <Separator />
-        <FacebookLogin>
-          <FontAwesomeIcon icon={faFacebookSquare} />
-          <span>Log in with Facebook</span>
-        </FacebookLogin>
       </FormBox>
-      <BottomBox
-        cta="Don't have an account ?"
-        link={routes.signUp}
-        linkText="Sign up"
-      />
+      <BottomBox cta="Have an account ?" link={routes.home} linkText="Log in" />
     </AuthLayout>
   );
 };
 
-export default Login;
+export default SignUp;
