@@ -15,7 +15,7 @@ import Separator from "../components/auth/Separator";
 import PageTitle from "../components/PageTitle";
 import { useForm } from "react-hook-form";
 import FormError from "../components/auth/FormError";
-import { useState } from "react";
+import { logUserIn } from "../apollo";
 
 const LOGIN_MUTATION = gql`
   mutation login($username: String!, $password: String!) {
@@ -36,14 +36,14 @@ const FacebookLogin = styled.div`
 `;
 
 const Login = () => {
-  const [loginError, setLoginError] = useState("");
   const {
     register,
     handleSubmit,
     formState,
     getValues,
-    setValue,
     clearErrors,
+    setError,
+    trigger,
   } = useForm({
     mode: "onChange",
   });
@@ -52,8 +52,11 @@ const Login = () => {
       login: { ok, error, token },
     } = data;
     if (!ok) {
-      setLoginError(error);
+      return setError("result", {
+        message: error,
+      });
     }
+    logUserIn(token);
   };
   const [login, { loading }] = useMutation(LOGIN_MUTATION, { onCompleted });
   const onSubmitValid = (data) => {
@@ -64,6 +67,10 @@ const Login = () => {
     login({
       variables: { username, password },
     });
+  };
+  const clearLoginError = () => {
+    clearErrors("result");
+    trigger();
   };
   return (
     <AuthLayout>
@@ -77,6 +84,7 @@ const Login = () => {
             type="text"
             placeholder="Username"
             hasError={Boolean(formState?.errors?.username?.message)}
+            onFocus={clearLoginError}
             {...register("username", {
               required: "Username required",
               minLength: {
@@ -90,6 +98,7 @@ const Login = () => {
             type="password"
             placeholder="Password"
             hasError={Boolean(formState?.errors?.password?.message)}
+            onFocus={clearLoginError}
             {...register("password", { required: "Password required" })}
           />
           <FormError message={formState?.errors?.password?.message} />
@@ -98,7 +107,7 @@ const Login = () => {
             value={loading ? "Loading..." : "Log in"}
             disabled={!formState.isValid || loading}
           />
-          <FormError message={loginError} />
+          <FormError message={formState?.errors?.result?.message} />
         </form>
         <Separator />
         <FacebookLogin>
