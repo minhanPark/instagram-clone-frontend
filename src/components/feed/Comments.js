@@ -1,5 +1,16 @@
 import styled from "styled-components";
 import Comment from "./Comment";
+import { gql, useMutation } from "@apollo/client";
+import { useForm } from "react-hook-form";
+
+const CREATE_COMMENT_MUTATION = gql`
+  mutation createComment($photoId: Int!, $payload: String!) {
+    createComment(photoId: $photoId, payload: $payload) {
+      ok
+      error
+    }
+  }
+`;
 
 const CommentsContainer = styled.div`
   margin-top: 20px;
@@ -12,7 +23,24 @@ const CommentCount = styled.span`
   font-size: 10px;
 `;
 
-const Comments = ({ author, caption, commentNumber, comments }) => {
+const Comments = ({ photoId, author, caption, commentNumber, comments }) => {
+  const [createCommentMutation, { loading }] = useMutation(
+    CREATE_COMMENT_MUTATION
+  );
+  const { register, handleSubmit, setValue } = useForm();
+  const onValid = (data) => {
+    const { payload } = data;
+    if (loading) {
+      return;
+    }
+    createCommentMutation({
+      variables: {
+        photoId,
+        payload,
+      },
+    });
+    setValue("payload", "");
+  };
   return (
     <CommentsContainer>
       <Comment author={author} payload={caption} />
@@ -26,6 +54,15 @@ const Comments = ({ author, caption, commentNumber, comments }) => {
           payload={comment.payload}
         />
       ))}
+      <div>
+        <form onSubmit={handleSubmit(onValid)}>
+          <input
+            type="text"
+            placeholder="Write a comment..."
+            {...register("payload", { required: true })}
+          />
+        </form>
+      </div>
     </CommentsContainer>
   );
 };
