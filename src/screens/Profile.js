@@ -7,7 +7,7 @@ import { FatText } from "../components/shared";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faComment, faHeart } from "@fortawesome/free-regular-svg-icons";
 import PageTitle from "../components/PageTitle";
-import useUser, { ME_QUERY } from "../hooks/useUser";
+import useUser from "../hooks/useUser";
 
 const FOLLOW_USER_MUTATION = gql`
   mutation followUser($username: String!) {
@@ -158,6 +158,15 @@ const Profile = () => {
         },
       },
     });
+    const { me } = userData;
+    cache.modify({
+      id: `User:${me.username}`,
+      fields: {
+        totalFollowings(prev) {
+          return prev - 1;
+        },
+      },
+    });
   };
   const [unfollowUser] = useMutation(UNFOLLOW_USER_MUTATION, {
     variables: {
@@ -181,6 +190,15 @@ const Profile = () => {
         },
         totalFollowers(prev) {
           return prev + 1;
+        },
+      },
+    });
+    const { me } = userData;
+    cache.modify({
+      id: `User:${me.username}`,
+      fields: {
+        totalFollowings(prev) {
+          return prev - 1;
         },
       },
     });
